@@ -1,13 +1,42 @@
-import { Link, NavLink } from "react-router-dom";
-import { Menu } from "antd";
-import { BookOutlined, HomeTwoTone, UserOutlined } from "@ant-design/icons";
-import { useState } from "react";
-
+import { Link, useNavigate  } from "react-router-dom";
+import { Menu, message  } from "antd";
+import {
+    AliwangwangOutlined,
+    BookOutlined,
+    HomeTwoTone,
+    LoginOutlined,
+    SettingOutlined,
+    UserOutlined,
+} from "@ant-design/icons";
+import { useContext, useState } from "react";
+import { AuthContext } from "../context/auth.context";
+import { logoutAPI } from "../../services/api.service";
 const Header = () => {
     const [current, setCurrent] = useState("");
+    const navigate = useNavigate();
+    const { user, setUser } = useContext(AuthContext);
     const onClick = (e) => {
-        console.log("click ", e);
         setCurrent(e.key);
+    };
+
+    const handleLogout = async () => {
+        const res = await logoutAPI();
+        if (res.data) {
+            // clean data
+            localStorage.removeItem("access_token");
+            setUser({
+                email: "",
+                phone: "",
+                fullName: "",
+                role: "",
+                avatar: "",
+                id: "",
+            });
+            message.success("Logout thành công.");
+
+            // redirect to home
+            navigate("/");
+        }
     };
 
     const items = [
@@ -26,6 +55,39 @@ const Header = () => {
             key: "books",
             icon: <BookOutlined />,
         },
+        ...(!user.id
+            ? [
+                  {
+                      label: <Link to={"/login"}>Đăng nhập</Link>,
+                      key: "login",
+                      icon: <LoginOutlined />,
+                  },
+              ]
+            : []),
+
+        ...(user.id
+            ? [
+                  {
+                      label: `Welcome ${user.fullName}`,
+                      key: "setting",
+                      icon: <AliwangwangOutlined />,
+                      children: [
+                          {
+                              label: (
+                                  <span
+                                      onClick={() => {
+                                          handleLogout();
+                                      }}
+                                  >
+                                      Đăng xuất
+                                  </span>
+                              ),
+                              key: "logout",
+                          },
+                      ],
+                  },
+              ]
+            : []),
     ];
 
     return (

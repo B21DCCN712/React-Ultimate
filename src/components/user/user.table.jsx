@@ -3,7 +3,7 @@ import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import UpdateUserModal from "./update.user.modal";
 import { useState } from "react";
 import ViewUserDetail from "./view.user.detail";
-import { deleteUserAPT } from "../../services/api.service";
+import { deleteUserAPI } from "../../services/api.service";
 const UserTable = (props) => {
     const {
         dataUser,
@@ -84,7 +84,7 @@ const UserTable = (props) => {
     ];
 
     const handleDeteleUser = async (id) => {
-        const res = await deleteUserAPT(id);
+        const res = await deleteUserAPI(id);
         if (res.data) {
             notification.success({
                 message: "Delete User",
